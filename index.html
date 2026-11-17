@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Yoti Endrianis, A.Md., S.Pd., Gr.">
+<meta name="copyright" content="© 2026 Yoti Endrianis">
+<title>ATR-INTERACTIVE LAB | LKPD Digital ATR</title>
+<style>
+:root{
+  --navy:#17324d; --teal:#1f8a8a; --gold:#d8a63c;
+  --cream:#fffaf0; --white:#ffffff; --text:#24313d;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#eef5f5;color:var(--text)}
+header{background:linear-gradient(135deg,var(--navy),var(--teal));color:white;padding:28px 20px;text-align:center}
+.badge{display:inline-block;background:rgba(255,255,255,.16);padding:6px 12px;border-radius:20px;font-size:13px;margin-bottom:10px}
+h1{margin:5px 0;font-size:30px}
+.subtitle{margin:6px auto;max-width:700px;line-height:1.5}
+.container{max-width:950px;margin:25px auto;padding:0 16px}
+.card{background:white;border-radius:18px;padding:22px;margin-bottom:18px;box-shadow:0 5px 18px rgba(0,0,0,.07)}
+.card h2{margin-top:0;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px}
+.menu{display:block;text-decoration:none;color:var(--text);background:var(--cream);border:1px solid #eadfca;border-radius:15px;padding:18px;transition:.2s}
+.menu:hover{transform:translateY(-2px);box-shadow:0 5px 12px rgba(0,0,0,.08)}
+.icon{font-size:28px}
+.menu strong{display:block;margin:8px 0 4px;color:var(--navy)}
+.notice{border-left:5px solid var(--gold);background:#fffaf0;padding:14px 16px;border-radius:8px;line-height:1.6}
+footer{text-align:center;padding:25px;color:#667; font-size:13px}
+button{border:0;background:var(--teal);color:white;padding:12px 18px;border-radius:10px;font-weight:bold;cursor:pointer;min-height:44px}
+.menu:focus, button:focus, input:focus, textarea:focus, select:focus{outline:3px solid rgba(31,138,138,.25);outline-offset:2px}
+
+input, textarea, select{
+  width:100%;padding:11px;border:1px solid #cfd8dc;border-radius:9px;
+  margin:6px 0 12px;font-size:15px;background:#fff;
+}
+label{font-weight:bold;color:#17324d}
+.activity{background:#f7fbfb;border:1px solid #dceaea;border-radius:14px;padding:16px;margin:12px 0}
+.question{margin:14px 0;padding:14px;background:white;border-radius:12px;border:1px solid #e5eeee}
+.progress{height:10px;background:#e6eeee;border-radius:20px;overflow:hidden;margin:12px 0}
+.progress span{display:block;height:100%;width:50%;background:#1f8a8a}
+.feedback{padding:12px;border-radius:10px;background:#fffaf0;margin-top:10px;display:none}
+.autosave{font-size:13px;color:#52636f;margin-top:8px}
+
+.action-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.action-row button{flex:1 1 220px}
+button.secondary{background:#17324d}
+.export-note{font-size:13px;line-height:1.6;color:#52636f;margin-top:10px}
+@media (max-width:600px){
+  header{padding:22px 14px}
+  h1{font-size:24px}
+  .subtitle{font-size:14px}
+  .container{margin:14px auto;padding:0 10px}
+  .card{padding:16px;border-radius:14px;margin-bottom:12px}
+  .grid{grid-template-columns:1fr}
+  .menu{padding:15px}
+  .activity,.question{padding:13px}
+  button,.menu{min-height:46px}
+  input,textarea,select{font-size:16px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">ATR-INTERACTIVE LAB • v1.4</div>
+  <h1>🐄 LKPD INTERAKTIF DIGITAL ATR</h1>
+  <p class="subtitle">Agribisnis Ternak Ruminansia — belajar melalui observasi, praktik, teknologi, analisis data, dan refleksi.</p>
+</header>
+
+<main class="container">
+  <section class="card">
+    <h2>📌 LKPD 01 — Menentukan Bobot Badan Sapi</h2>
+    <p><b>Pertanyaan pemantik:</b> Bagaimana peternak dapat memperkirakan bobot sapi tanpa menggunakan timbangan ternak?</p>
+    <div class="notice">
+      <b>Alur belajar:</b> Pelajari → Amati → Ukur → Masukkan Data → Hitung → Analisis → Tantangan STEM → Refleksi
+    </div>
+    <div class="autosave">💾 Isian LKPD tersimpan otomatis di perangkat ini selama siswa menggunakan browser yang sama.</div>
+  </section>
+
+  <section class="card">
+    <h2>🚀 Menu Pembelajaran</h2>
+    <div class="grid">
+      <a class="menu" href="#identitas"><span class="icon">🪪</span><strong>Identitas Siswa</strong><span>Isi nama, kelas, kelompok, dan tanggal.</span></a>
+      <a class="menu" href="#materi"><span class="icon">📚</span><strong>Materi</strong><span>Pelajari konsep bobot badan dan pengukuran ternak.</span></a>
+      <a class="menu" href="#observasi"><span class="icon">🐄</span><strong>Observasi</strong><span>Catat identitas dan kondisi ternak.</span></a>
+      <a class="menu" href="#pengukuran"><span class="icon">📏</span><strong>Pengukuran</strong><span>Catat lingkar dada dan panjang badan.</span></a>
+      <a class="menu" href="#bobotcalc"><span class="icon">🧮</span><strong>BOBOT-CALC</strong><span>Tempat menghubungkan aplikasi perhitungan.</span></a>
+      <a class="menu" href="#rumistem"><span class="icon">🌱</span><strong>RUMI-STEM</strong><span>Tantangan STEM berbasis data ternak.</span></a>
+      <a class="menu" href="#refleksi"><span class="icon">✍️</span><strong>Refleksi</strong><span>Renungkan proses dan hasil belajar.</span></a>
+      <a class="menu" href="#asesmen"><span class="icon">📊</span><strong>Asesmen</strong><span>Penilaian proses, hasil, dan pemahaman.</span></a>
+      <a class="menu" href="#pengumpulan"><span class="icon">📤</span><strong>Pengumpulan Hasil</strong><span>Unduh JSON atau cetak hasil sebagai PDF.</span></a>
+      <a class="menu" href="#panduan"><span class="icon">👩‍🏫</span><strong>Panduan Guru</strong><span>Petunjuk penggunaan dan replikasi.</span></a>
+    </div>
+  </section>
+
+
+  <section class="card" id="identitas">
+    <h2>🪪 Identitas Siswa</h2>
+    <p>Isi identitas sebelum mengerjakan LKPD agar guru dapat mengenali hasil pekerjaanmu.</p>
+    <div class="grid">
+      <div><label for="namaSiswa">Nama lengkap</label><input id="namaSiswa" type="text" autocomplete="name" placeholder="Tuliskan nama lengkap"></div>
+      <div><label for="kelasSiswa">Kelas</label><input id="kelasSiswa" type="text" placeholder="Contoh: XI ATR"></div>
+      <div><label for="kelompokSiswa">Kelompok (jika ada)</label><input id="kelompokSiswa" type="text" placeholder="Contoh: Kelompok 1"></div>
+      <div><label for="tanggalSiswa">Tanggal pengerjaan</label><input id="tanggalSiswa" type="date"></div>
+    </div>
+  </section>
+
+  <section class="card" id="materi">
+    <h2>📚 Materi Ringkas — Penentuan Bobot Badan Ternak</h2>
+    <div class="activity">
+      <h3>1. Mengapa bobot badan perlu diketahui?</h3>
+      <p>Bobot badan merupakan salah satu data penting dalam pengelolaan ternak. Data ini dapat membantu peternak dalam mempertimbangkan pemberian pakan, pemantauan pertumbuhan, pengelolaan ternak, dan perkiraan nilai jual.</p>
+
+      <h3>2. Jika tidak tersedia timbangan ternak?</h3>
+      <p>Pada kondisi tertentu, bobot badan dapat <b>diperkirakan</b> menggunakan ukuran tubuh ternak. Hasilnya merupakan estimasi, sehingga ketelitian pengukuran dan metode yang digunakan perlu diperhatikan.</p>
+
+      <h3>3. Pengukuran yang digunakan dalam LKPD</h3>
+      <ul>
+        <li><b>Lingkar dada:</b> diukur mengelilingi bagian dada ternak dengan posisi alat ukur yang tepat.</li>
+        <li><b>Panjang badan:</b> diukur dari titik tubuh yang ditentukan sesuai metode pengukuran yang dipelajari.</li>
+      </ul>
+
+      <h3>4. Prinsip penting</h3>
+      <div class="notice"><b>Data yang baik → perhitungan yang lebih dapat dipertanggungjawabkan → keputusan yang lebih tepat.</b><br>
+      Karena itu, siswa harus melakukan pengukuran dengan aman, tenang, teliti, dan mengikuti prosedur guru.</div>
+    </div>
+  </section>
+
+  <section class="card" id="observasi">
+    <h2>🐄 Aktivitas 1 — Observasi Ternak</h2>
+    <p>Amati ternak secara langsung sebelum melakukan pengukuran.</p>
+    <div class="activity">
+      <label>Nama/ID ternak</label>
+      <input id="ternak" placeholder="Contoh: Sapi 01">
+      <label>Jenis/kelamin</label>
+      <input id="jenis" placeholder="Contoh: Sapi Bali / Jantan">
+      <label>Kondisi umum ternak</label>
+      <select id="kondisi">
+        <option value="">Pilih kondisi</option>
+        <option>Sehat dan aktif</option>
+        <option>Cukup aktif</option>
+        <option>Perlu diamati lebih lanjut</option>
+      </select>
+      <label>Catatan hasil pengamatan</label>
+      <textarea id="catatan" rows="3" placeholder="Tuliskan ciri fisik atau perilaku yang diamati..."></textarea>
+    </div>
+  </section>
+
+  <section class="card" id="pengukuran">
+    <h2>📏 Aktivitas 2 — Pengukuran</h2>
+    <p>Lakukan pengukuran dengan teknik yang telah dipelajari guru.</p>
+    <div class="activity">
+      <label>Lingkar dada (cm)</label>
+      <input id="ld" type="number" min="0" placeholder="Masukkan hasil pengukuran">
+      <label>Panjang badan (cm)</label>
+      <input id="pb" type="number" min="0" placeholder="Masukkan hasil pengukuran">
+      <label>Umur ternak (tahun, jika diketahui)</label>
+      <input id="umur" type="number" min="0" step="0.1" placeholder="Contoh: 2.5">
+      <button onclick="simpanData()">💾 SIMPAN DATA</button>
+      <div id="dataFeedback" class="feedback"></div>
+    </div>
+  </section>
+
+  <section class="card" id="bobotcalc">
+    <h2>🧮 Aktivitas 3 — BOBOT-CALC</h2>
+    <p>Gunakan data pengukuran yang telah dicatat untuk melakukan estimasi bobot badan.</p>
+    <div class="notice"><b>Petunjuk:</b> Buka BOBOT-CALC, masukkan data sesuai petunjuk aplikasi, lalu catat hasilnya pada bagian analisis.</div>
+    <br>
+    <a href="https://yotie-ai.github.io/BOBOT--CALC/" target="_blank" rel="noopener"
+style="display:inline-block;text-decoration:none;background:#1f8a8a;color:white;padding:12px 18px;border-radius:10px;font-weight:bold">
+BUKA BOBOT-CALC ↗
+</a>
+    <div class="activity">
+      <label>Hasil estimasi bobot badan (kg)</label>
+      <input id="hasilbobot" type="number" min="0" placeholder="Masukkan hasil dari BOBOT-CALC">
+    </div>
+  </section>
+
+  <section class="card" id="analisis">
+    <h2>🧠 Aktivitas 3B — Analisis Hasil</h2>
+    <p>Jangan berhenti pada angka. Gunakan hasil BOBOT-CALC untuk menjelaskan kondisi yang kamu amati.</p>
+
+    <div class="question">
+      <b>1. Apakah hasil estimasi bobot sesuai dengan perkiraanmu sebelum menghitung?</b>
+      <textarea id="analisis1" rows="3" placeholder="Jelaskan alasanmu..."></textarea>
+    </div>
+
+    <div class="question">
+      <b>2. Mengapa kesalahan saat mengukur lingkar dada atau panjang badan dapat memengaruhi hasil estimasi?</b>
+      <textarea id="analisis2" rows="3" placeholder="Jelaskan hubungan data pengukuran dengan hasil..."></textarea>
+    </div>
+
+    <div class="question">
+      <b>3. Sebutkan minimal dua manfaat mengetahui perkiraan bobot badan ternak.</b>
+      <textarea id="analisis3" rows="3" placeholder="Tuliskan minimal dua manfaat..."></textarea>
+    </div>
+  </section>
+
+  <section class="card" id="rumistem">
+    <h2>🌱 Aktivitas 4 — Tantangan STEM</h2>
+    <p>Gunakan hasil estimasi bobot untuk memecahkan masalah sederhana yang berkaitan dengan kegiatan peternakan.</p>
+    <div class="question">
+      <b>Tantangan:</b> Mengapa data pengukuran yang teliti penting bagi peternak ketika memperkirakan bobot ternak?
+      <textarea id="jawabstem" rows="4" placeholder="Tuliskan alasanmu..."></textarea>
+    </div>
+    <button onclick="cekProgres()">🔎 CEK PROGRES LKPD</button>
+    <div id="progresFeedback" class="feedback"></div>
+  </section>
+
+  <section class="card" id="kuis">
+    <h2>🎯 Cek Pemahaman</h2>
+
+    <div class="question">
+      <b>1. Tujuan utama pengukuran tubuh pada kegiatan ini adalah...</b><br>
+      <label><input type="radio" name="q1" value="a" style="width:auto"> Menghias ternak</label><br>
+      <label><input type="radio" name="q1" value="b" style="width:auto"> Mendapatkan data untuk memperkirakan bobot badan</label><br>
+      <label><input type="radio" name="q1" value="c" style="width:auto"> Menentukan warna bulu</label>
+    </div>
+
+    <div class="question">
+      <b>2. Apa yang harus dilakukan jika hasil pengukuran diragukan?</b><br>
+      <label><input type="radio" name="q2" value="a" style="width:auto"> Mengarang data</label><br>
+      <label><input type="radio" name="q2" value="b" style="width:auto"> Mengulang/mengecek pengukuran sesuai prosedur</label><br>
+      <label><input type="radio" name="q2" value="c" style="width:auto"> Menghapus hasil</label>
+    </div>
+
+    <button onclick="cekKuis()">✅ PERIKSA JAWABAN</button>
+    <div id="quizFeedback" class="feedback"></div>
+  </section>
+
+  <section class="card" id="refleksi">
+    <h2>✍️ Aktivitas 5 — Refleksi</h2>
+    <div class="activity">
+      <label>1. Apa hal terpenting yang saya pelajari?</label>
+      <textarea id="ref1" rows="3"></textarea>
+      <label>2. Apa kesulitan saya saat melakukan pengukuran?</label>
+      <textarea id="ref2" rows="3"></textarea>
+      <label>3. Bagaimana teknologi membantu pekerjaan peternak?</label>
+      <textarea id="ref3" rows="3"></textarea>
+    </div>
+  </section>
+
+  <section class="card" id="asesmen">
+    <h2>📊 Asesmen Diri</h2>
+    <div class="question">
+      <b>Apakah kamu sudah melakukan pengukuran dengan teliti?</b><br>
+      <label><input type="radio" name="teliti" value="ya" style="width:auto"> Ya</label>
+      <label><input type="radio" name="teliti" value="belum" style="width:auto"> Belum</label>
+    </div>
+    <div class="question">
+      <b>Apakah kamu dapat menjelaskan arti hasil estimasi bobot?</b><br>
+      <label><input type="radio" name="paham" value="ya" style="width:auto"> Ya</label>
+      <label><input type="radio" name="paham" value="belum" style="width:auto"> Belum</label>
+    </div>
+    <p><b>Progres LKPD</b></p>
+    <div class="progress"><span id="bar"></span></div>
+    <button onclick="cekProgres()">📊 LIHAT PROGRES</button>
+    <button onclick="resetLKPD()" style="background:#6b7280;margin-left:6px">♻️ RESET ISIAN</button>
+    <div id="assessmentFeedback" class="feedback"></div>
+  </section>
+
+
+  <section class="card" id="pengumpulan">
+    <h2>📤 Pengumpulan Hasil LKPD</h2>
+    <p>Setelah semua aktivitas selesai, periksa kembali identitas dan jawabanmu. Pilih salah satu cara berikut untuk menyerahkan hasil kepada guru.</p>
+    <div class="notice"><b>Penting:</b> Isian tersimpan otomatis hanya pada perangkat/browser yang digunakan. Hasil tidak terkirim otomatis kepada guru. Kamu harus mengunduh atau mencetak hasil, lalu mengirimkan file tersebut kepada guru.</div>
+    <div class="action-row">
+      <button type="button" onclick="unduhJSON()">⬇️ UNDUH HASIL (JSON)</button>
+      <button type="button" class="secondary" onclick="cetakHasil()">🖨️ CETAK / SIMPAN PDF</button>
+    </div>
+    <p class="export-note">Rekomendasi: kirim file PDF melalui saluran pengumpulan yang ditentukan guru. File JSON disimpan sebagai salinan data untuk pengolahan lebih lanjut.</p>
+    <div id="exportFeedback" class="feedback" aria-live="polite"></div>
+  </section>
+
+  <section class="card" id="panduan">
+    <h2>👩‍🏫 Panduan Guru</h2>
+    <p>Versi ini merupakan master awal yang dapat direplikasi oleh guru ATR lain. Identitas sekolah, kelas, dan pelaksanaan dapat disesuaikan tanpa mengubah kepemilikan karya.</p>
+    <div class="notice">
+      <b>Hak cipta:</b> © 2026 Yoti Endrianis, A.Md., S.Pd., Gr. — ATR-INTERACTIVE LAB.
+      Penggunaan untuk pembelajaran diperbolehkan sesuai ketentuan penggunaan yang ditetapkan pengembang. Penggandaan, modifikasi, publikasi ulang, distribusi, atau pemanfaatan komersial di luar ketentuan memerlukan izin pengembang.
+    </div>
+  </section>
+</main>
+
+<footer>
+  ATR-INTERACTIVE LAB • Versi 1.4 • © 2026 Yoti Endrianis, A.Md., S.Pd., Gr.
+</footer>
+
+<script>
+const fieldIds = [
+  "namaSiswa","kelasSiswa","kelompokSiswa","tanggalSiswa",
+  "ternak","jenis","kondisi","catatan","ld","pb","umur","hasilbobot",
+  "analisis1","analisis2","analisis3","jawabstem","ref1","ref2","ref3"
+];
+
+function val(id){
+  return document.getElementById(id)?.value.trim() || "";
+}
+
+function saveForm(){
+  const data = {};
+  fieldIds.forEach(id => {
+    const el = document.getElementById(id);
+    if(el) data[id] = el.value;
+  });
+  ["teliti","paham","q1","q2"].forEach(name => {
+    const checked = document.querySelector('input[name="'+name+'"]:checked');
+    data[name] = checked ? checked.value : "";
+  });
+  localStorage.setItem("atr_interactive_lab_lkpd01", JSON.stringify(data));
+}
+
+function restoreForm(){
+  try{
+    const raw = localStorage.getItem("atr_interactive_lab_lkpd01");
+    if(!raw) return;
+    const data = JSON.parse(raw);
+    fieldIds.forEach(id => {
+      const el = document.getElementById(id);
+      if(el && data[id] !== undefined) el.value = data[id];
+    });
+    ["teliti","paham","q1","q2"].forEach(name => {
+      if(!data[name]) return;
+      const el = document.querySelector('input[name="'+name+'"][value="'+data[name]+'"]');
+      if(el) el.checked = true;
+    });
+  }catch(e){}
+}
+
+function simpanData(){
+  saveForm();
+  const ids=["ternak","jenis","kondisi","ld","pb"];
+  const ok=ids.every(id=>val(id)!=="");
+  const box=document.getElementById("dataFeedback");
+  box.style.display="block";
+  box.innerHTML=ok
+    ? "✅ Data observasi dan pengukuran sudah diisi dan tersimpan. Lanjutkan ke BOBOT-CALC."
+    : "⚠️ Lengkapi ID ternak, jenis/kelamin, kondisi, lingkar dada, dan panjang badan terlebih dahulu.";
+}
+
+function cekProgres(){
+  saveForm();
+  let done=0,total=8;
+  if(["ternak","jenis","kondisi","catatan"].every(id=>val(id)!=="")) done++;
+  if(["ld","pb"].every(id=>val(id)!=="")) done++;
+  if(val("hasilbobot")!=="") done++;
+  if(val("jawabstem")!=="") done++;
+  if(["analisis1","analisis2","analisis3"].every(id=>val(id)!=="")) done++;
+  if(["ref1","ref2","ref3"].every(id=>val(id)!=="")) done++;
+  if(document.querySelector('input[name="teliti"]:checked')) done++;
+  if(document.querySelector('input[name="paham"]:checked')) done++;
+  const pct=Math.round(done/total*100);
+  document.getElementById("bar").style.width=pct+"%";
+  const box=document.getElementById("progresFeedback");
+  box.style.display="block";
+  box.innerHTML="📈 Progres pengisian LKPD: <b>"+pct+"%</b>. "+
+    (pct===100?"🎉 Semua bagian utama sudah diisi.":"Lengkapi bagian yang masih kosong.");
+  const box2=document.getElementById("assessmentFeedback");
+  if(box2){
+    box2.style.display="block";
+    box2.innerHTML="📈 Progres pengisian LKPD: <b>"+pct+"%</b>. Data tersimpan otomatis di perangkat.";
+  }
+}
+
+function cekKuis(){
+  saveForm();
+  const q1=document.querySelector('input[name="q1"]:checked')?.value;
+  const q2=document.querySelector('input[name="q2"]:checked')?.value;
+  const box=document.getElementById("quizFeedback");
+  box.style.display="block";
+  if(!q1 || !q2){
+    box.innerHTML="⚠️ Pilih jawaban untuk kedua pertanyaan terlebih dahulu.";
+    return;
+  }
+  let skor=(q1==="b"?1:0)+(q2==="b"?1:0);
+  box.innerHTML="Hasil cek pemahaman: <b>"+skor+"/2 benar</b>. "+
+    (skor===2?"🎉 Bagus! Kamu memahami konsep dasarnya.":"📚 Pelajari kembali materi lalu coba lagi.");
+}
+
+
+function getSubmissionData(){
+  saveForm();
+  const fields = {};
+  fieldIds.forEach(id => {
+    const el = document.getElementById(id);
+    fields[id] = el ? el.value.trim() : "";
+  });
+  ["teliti","paham","q1","q2"].forEach(name => {
+    const el = document.querySelector('input[name="'+name+'"]:checked');
+    fields[name] = el ? el.value : "";
+  });
+  const quizComplete = Boolean(fields.q1 && fields.q2);
+  const quizScore = quizComplete ? (Number(fields.q1 === "b") + Number(fields.q2 === "b")) : null;
+  let done = 0, total = 8;
+  if(["ternak","jenis","kondisi","catatan"].every(id => fields[id])) done++;
+  if(["ld","pb"].every(id => fields[id])) done++;
+  if(fields.hasilbobot) done++;
+  if(fields.jawabstem) done++;
+  if(["analisis1","analisis2","analisis3"].every(id => fields[id])) done++;
+  if(["ref1","ref2","ref3"].every(id => fields[id])) done++;
+  if(fields.teliti) done++;
+  if(fields.paham) done++;
+  return {
+    aplikasi:"ATR-INTERACTIVE LAB", lkpd:"LKPD 01 — Menentukan Bobot Badan Sapi", versi:"1.4",
+    waktu_ekspor:new Date().toISOString(),
+    identitas:{nama:fields.namaSiswa, kelas:fields.kelasSiswa, kelompok:fields.kelompokSiswa, tanggal:fields.tanggalSiswa},
+    jawaban:fields, kuis:{status:quizComplete?"Dijawab lengkap":"Belum dijawab lengkap", skor:quizScore, skor_maksimal:2},
+    progres_pengisian_persen:Math.round(done/total*100),
+    catatan:"Progres menunjukkan kelengkapan isian, bukan nilai atau jaminan kebenaran jawaban."
+  };
+}
+function namaFile(value){
+  return (value || "Siswa").trim().replace(/[^a-z0-9_-]+/gi,"_").replace(/^_+|_+$/g,"").slice(0,40) || "Siswa";
+}
+function validasiIdentitas(data){
+  if(data.identitas.nama && data.identitas.kelas) return true;
+  const box=document.getElementById("exportFeedback");
+  box.style.display="block";
+  box.textContent="Lengkapi nama lengkap dan kelas terlebih dahulu sebelum mengunduh hasil.";
+  document.getElementById(!data.identitas.nama?"namaSiswa":"kelasSiswa").focus();
+  return false;
+}
+function unduhJSON(){
+  const data=getSubmissionData();
+  if(!validasiIdentitas(data)) return;
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json;charset=utf-8"});
+  const url=URL.createObjectURL(blob), a=document.createElement("a");
+  a.href=url; a.download="ATR_LKPD01_"+namaFile(data.identitas.nama)+".json";
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  const box=document.getElementById("exportFeedback");
+  box.style.display="block"; box.textContent="File JSON berhasil diunduh. Kirimkan file kepada guru atau simpan sebagai salinan data.";
+}
+function escapeReport(v){
+  return String(v==null || v===""?"—":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/\n/g,"<br>");
+}
+function cetakHasil(){
+  const d=getSubmissionData();
+  if(!validasiIdentitas(d)) return;
+  const labels=[
+    ["Nama siswa",d.identitas.nama],["Kelas",d.identitas.kelas],["Kelompok",d.identitas.kelompok],["Tanggal pengerjaan",d.identitas.tanggal],
+    ["Nama/ID ternak",d.jawaban.ternak],["Jenis/kelamin",d.jawaban.jenis],["Kondisi umum",d.jawaban.kondisi],["Catatan observasi",d.jawaban.catatan],
+    ["Lingkar dada (cm)",d.jawaban.ld],["Panjang badan (cm)",d.jawaban.pb],["Umur ternak (tahun)",d.jawaban.umur],["Estimasi bobot (kg)",d.jawaban.hasilbobot],
+    ["Analisis 1",d.jawaban.analisis1],["Analisis 2",d.jawaban.analisis2],["Analisis 3",d.jawaban.analisis3],["Tantangan STEM",d.jawaban.jawabstem],
+    ["Kuis",d.kuis.skor===null?"Belum dijawab lengkap":d.kuis.skor+"/2 benar"],
+    ["Refleksi 1",d.jawaban.ref1],["Refleksi 2",d.jawaban.ref2],["Refleksi 3",d.jawaban.ref3],
+    ["Asesmen diri: pengukuran teliti",d.jawaban.teliti],["Asesmen diri: memahami estimasi",d.jawaban.paham],
+    ["Progres pengisian",d.progres_pengisian_persen+"%"]
+  ];
+  const rows=labels.map(x=>"<tr><th>"+escapeReport(x[0])+"</th><td>"+escapeReport(x[1])+"</td></tr>").join("");
+  const report=`<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Hasil LKPD ATR</title>
+  <style>body{font-family:Arial,sans-serif;color:#24313d;margin:28px auto;max-width:900px;padding:0 18px;line-height:1.5}h1{color:#17324d;font-size:22px}.sub{color:#52636f}.note{background:#fff8e8;border-left:4px solid #d8a63c;padding:10px 13px;margin:16px 0}table{width:100%;border-collapse:collapse}th,td{border:1px solid #cfd8dc;padding:9px;text-align:left;vertical-align:top}th{width:30%;background:#eef5f5;color:#17324d}.actions{margin:18px 0}button{background:#1f8a8a;color:#fff;border:0;padding:11px 18px;border-radius:8px;font-weight:bold}footer{margin-top:24px;font-size:12px;color:#667;text-align:center}@media print{body{margin:0;max-width:none}.actions{display:none}tr{break-inside:avoid}}</style></head>
+  <body><h1>ATR-INTERACTIVE LAB — HASIL LKPD 01</h1><p class="sub">Menentukan Bobot Badan Sapi | Versi 1.4</p>
+  <div class="note"><b>Catatan:</b> Progres menunjukkan kelengkapan isian, bukan nilai atau jaminan kebenaran jawaban. Estimasi bobot bukan pengganti penimbangan aktual.</div>
+  <div class="actions"><button onclick="window.print()">Cetak / Simpan sebagai PDF</button> Pilih “Save as PDF / Simpan sebagai PDF” pada pilihan printer.</div>
+  <table>${rows}</table><footer>ATR-INTERACTIVE LAB • © 2026 Yoti Endrianis, A.Md., S.Pd., Gr.<br>Diekspor: ${escapeReport(new Date().toLocaleString("id-ID"))}</footer></body></html>`;
+  const win=window.open("","_blank");
+  if(!win){
+    const box=document.getElementById("exportFeedback"); box.style.display="block";
+    box.textContent="Jendela laporan diblokir browser. Izinkan pop-up untuk halaman ini, lalu coba lagi."; return;
+  }
+  win.document.open(); win.document.write(report); win.document.close();
+}
+
+function resetLKPD(){
+  if(!confirm("Hapus semua isian LKPD pada perangkat ini?")) return;
+  localStorage.removeItem("atr_interactive_lab_lkpd01");
+  location.reload();
+}
+
+document.addEventListener("input", saveForm);
+document.addEventListener("change", saveForm);
+document.addEventListener("DOMContentLoaded", () => {
+  restoreForm();
+  const dateField=document.getElementById("tanggalSiswa");
+  if(dateField && !dateField.value){
+    const now=new Date();
+    dateField.value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,10);
+    saveForm();
+  }
+});
+</script>
+</body>
+</html>
