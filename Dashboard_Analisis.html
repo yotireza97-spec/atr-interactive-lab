@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Guru — ATR-INTERACTIVE LAB</title>
+<style>
+:root{--navy:#17324d;--teal:#167c80;--mint:#e9f5f2;--gold:#f3b64b;--ink:#243746;--muted:#667987;--line:#dce6e9;--paper:#f5f8fa;--white:#fff;--red:#b84b4b}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+header{background:linear-gradient(120deg,#17324d,#167c80);color:white;padding:25px max(18px,calc((100% - 1160px)/2))}
+header .eyebrow{font-size:12px;letter-spacing:1.5px;opacity:.85;font-weight:bold}h1{font-size:clamp(23px,4vw,34px);margin:8px 0}header p{margin:0;opacity:.9;line-height:1.5}
+main{max-width:1160px;margin:22px auto;padding:0 16px 40px}
+.notice{background:#fff8e8;border:1px solid #f1d99f;border-radius:12px;padding:13px 15px;line-height:1.5;font-size:13px;margin-bottom:18px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:16px 0}
+button,.filelabel{border:0;border-radius:9px;padding:11px 15px;font-weight:bold;cursor:pointer;font-size:13px;display:inline-flex;align-items:center;gap:7px}
+.primary{background:var(--teal);color:white}.secondary{background:#e7eff2;color:var(--navy)}.danger{background:#fff0f0;color:var(--red)}button:focus-visible,.filelabel:focus-within{outline:3px solid #f3b64b;outline-offset:2px}
+.filelabel{background:var(--teal);color:white}.filelabel input{display:none}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.stat{background:white;border:1px solid var(--line);border-radius:13px;padding:16px;box-shadow:0 3px 12px #17324d0a}
+.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:27px;margin-top:7px;color:var(--navy)}
+.panel{background:white;border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:16px;box-shadow:0 3px 12px #17324d08}
+.panel h2{font-size:18px;margin:0 0 12px;color:var(--navy)}
+.filters{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:10px;margin-bottom:13px}
+input,select{width:100%;padding:11px 12px;border:1px solid #cbd9df;border-radius:9px;background:white;color:var(--ink);font-size:14px}
+.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:720px}th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #e8eef0;font-size:13px;vertical-align:top}th{background:#f3f7f8;color:#536875;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+td strong{color:var(--navy)}.muted{color:var(--muted)}.pill{display:inline-block;padding:4px 8px;border-radius:20px;background:#e9f5f2;color:#17686b;font-size:11px;font-weight:bold}.pill.warn{background:#fff4dc;color:#8c6418}.rowbtn{padding:7px 10px;background:#eaf0f3;color:#17324d;font-size:12px}
+.empty{text-align:center;color:var(--muted);padding:30px 12px;line-height:1.6}
+.small{font-size:12px;color:var(--muted);line-height:1.5}
+footer{text-align:center;color:#7b8b94;font-size:12px;padding:22px}
+dialog{border:0;border-radius:15px;max-width:760px;width:calc(100% - 24px);max-height:85vh;padding:0;box-shadow:0 20px 60px #10283b55}
+dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#eef6f5;display:flex;justify-content:space-between;gap:10px;align-items:center}.modalbody{padding:18px 20px;overflow:auto}.modalbody h3{color:var(--navy);margin:18px 0 8px;font-size:15px}.detailgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.detail{background:#f5f8fa;padding:10px;border-radius:8px;font-size:13px;line-height:1.5;overflow-wrap:anywhere}.detail b{display:block;color:#667987;font-size:11px;margin-bottom:4px}.modalactions{padding:0 20px 18px;display:flex;justify-content:flex-end;gap:8px}
+@media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}.filters{grid-template-columns:1fr}.toolbar button,.toolbar .filelabel{flex:1;justify-content:center}.detailgrid{grid-template-columns:1fr}}
+
+.analysis-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.analysis-card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:15px}
+.analysis-card span{display:block;color:var(--muted);font-size:12px}
+.analysis-card strong{display:block;font-size:25px;margin-top:7px;color:var(--navy)}
+.chart-row{display:grid;grid-template-columns:150px 1fr 55px;gap:10px;align-items:center;margin:10px 0;font-size:13px}
+.bar-track{height:13px;background:#edf2f4;border-radius:20px;overflow:hidden}
+.bar-fill{height:100%;background:var(--teal);border-radius:20px}
+.bar-fill.warn{background:#d69b32}.bar-fill.low{background:#bd6262}
+.status-pass{color:#176b50;background:#e7f5ee}.status-remedial{color:#985050;background:#fff0f0}
+.analysis-note{background:#eef6f5;border-left:4px solid var(--teal);padding:12px;border-radius:8px;font-size:13px;line-height:1.55;margin-bottom:12px}
+@media(max-width:720px){.analysis-grid{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 45px}}
+
+</style>
+</head>
+<body>
+<header>
+ <div class="eyebrow">SMK NEGERI 2 KERINCI · AGRIBISNIS TERNAK RUMINANSIA</div>
+ <h1>🐄 Dashboard Guru ATR-INTERACTIVE LAB</h1>
+ <p>Rekap hasil LKPD 01 — Menentukan Bobot Badan Sapi</p>
+</header>
+<main>
+ <div class="notice"><b>Privasi data:</b> Dashboard ini memproses file JSON di perangkat guru dan menyimpan rekap pada browser ini saja. Data tidak dikirim ke server. Jangan mengunggah file hasil siswa ke repository GitHub publik. Cadangkan data secara berkala menggunakan tombol ekspor.</div>
+ <div class="toolbar">
+  <label class="filelabel">＋ Impor file JSON siswa <input id="files" type="file" accept=".json,application/json" multiple></label>
+  <button class="secondary" id="csvBtn">⬇ Ekspor rekap CSV</button>
+  <button class="secondary" id="backupBtn">⬇ Cadangkan data</button>
+  <label class="filelabel" style="background:#536b7b">↥ Pulihkan cadangan <input id="restoreFile" type="file" accept=".json,application/json"></label>
+  <button class="danger" id="clearBtn">Hapus semua data</button>
+ </div>
+ <section class="stats">
+  <div class="stat"><span>Total kiriman siswa</span><strong id="total">0</strong></div>
+  <div class="stat"><span>Kelas terdata</span><strong id="classes">0</strong></div>
+  <div class="stat"><span>Rata-rata progres isian</span><strong id="avg">0%</strong></div>
+  <div class="stat"><span>Kuis lengkap</span><strong id="quiz">0</strong></div>
+ </section>
+ <section class="panel">
+  <h2>Daftar hasil pekerjaan siswa</h2>
+  <div class="filters">
+   <input id="search" type="search" placeholder="Cari nama siswa atau kelompok...">
+   <select id="classFilter"><option value="">Semua kelas</option></select>
+   <select id="sort"><option value="new">Urutkan: terbaru diimpor</option><option value="name">Nama A–Z</option><option value="progress">Progres tertinggi</option></select>
+  </div>
+  <div class="tablewrap">
+   <table><thead><tr><th>Nama siswa</th><th>Kelas / kelompok</th><th>Tanggal LKPD</th><th>Progres</th><th>Skor kuis</th><th>Detail</th></tr></thead><tbody id="rows"></tbody></table>
+   <div class="empty" id="empty">Belum ada hasil siswa.<br>Gunakan tombol <b>Impor file JSON siswa</b> setelah menerima file dari WhatsApp.</div>
+  </div>
+  <p class="small" id="status" aria-live="polite">Data tersimpan lokal di browser ini.</p>
+ </section>
+
+ <section class="panel" id="analisisPanel">
+  <h2>📊 Analisis Hasil Belajar — KKTP 75</h2>
+  <div class="analysis-note"><b>Dasar pembacaan:</b> Ketuntasan sementara dihitung dari persentase skor kuis (skor diperoleh ÷ skor maksimal × 100). Progres LKPD ditampilkan terpisah dan tidak dianggap sebagai nilai. Siswa tanpa skor kuis belum dapat dikategorikan tuntas atau perlu remedial.</div>
+  <div class="analysis-grid">
+   <div class="analysis-card"><span>Sudah memiliki skor kuis</span><strong id="aScored">0</strong></div>
+   <div class="analysis-card"><span>Tuntas (nilai ≥ 75)</span><strong id="aPassed">0</strong></div>
+   <div class="analysis-card"><span>Perlu remedial (nilai &lt; 75)</span><strong id="aRemedial">0</strong></div>
+   <div class="analysis-card"><span>Rata-rata nilai kuis</span><strong id="aAverage">—</strong></div>
+  </div>
+  <h3 style="font-size:15px;color:var(--navy)">Distribusi hasil kuis</h3>
+  <div id="analysisChart" class="small">Belum ada skor kuis untuk dianalisis.</div>
+  <h3 style="font-size:15px;color:var(--navy);margin-top:20px">Rekap ketuntasan per siswa</h3>
+  <div class="tablewrap"><table style="min-width:650px"><thead><tr><th>Nama siswa</th><th>Kelas</th><th>Progres LKPD</th><th>Nilai kuis</th><th>Status KKTP</th></tr></thead><tbody id="analysisRows"></tbody></table></div>
+  <p class="small" id="analysisFoot">Analisis akan diperbarui otomatis setelah data JSON diimpor.</p>
+ </section>
+
+ <footer>ATR-INTERACTIVE LAB · Dashboard Guru · Pengembang: Yoti Endrianis, A.Md., S.Pd., Gr. · #buguruyotie.ai</footer>
+</main>
+<dialog id="detailDialog">
+ <div class="modalhead"><div><b id="detailTitle">Detail siswa</b><div class="small">Rincian hasil LKPD</div></div><button class="secondary" id="closeDialog">Tutup ✕</button></div>
+ <div class="modalbody" id="detailBody"></div>
+ <div class="modalactions"><button class="danger" id="deleteOne">Hapus kiriman ini</button></div>
+</dialog>
+<script>
+const STORE="atr_dashboard_guru_v1";
+let submissions=[], activeId=null;
+const $=id=>document.getElementById(id);
+function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])).replace(/\n/g,"<br>")}
+function load(){try{submissions=JSON.parse(localStorage.getItem(STORE)||"[]");if(!Array.isArray(submissions))submissions=[]}catch(e){submissions=[]}}
+function save(){localStorage.setItem(STORE,JSON.stringify(submissions))}
+function normalize(d,filename){
+ if(!d||typeof d!=="object"||!d.identitas||!d.jawaban||d.aplikasi!=="ATR-INTERACTIVE LAB")throw Error("Format file bukan hasil ekspor ATR-INTERACTIVE LAB.");
+ const nama=String(d.identitas.nama||"").trim(), kelas=String(d.identitas.kelas||"").trim();
+ if(!nama||!kelas)throw Error("Identitas nama dan kelas tidak lengkap.");
+ const id=[nama.toLowerCase(),kelas.toLowerCase(),String(d.identitas.tanggal||""),String(d.waktu_ekspor||"")].join("|");
+ return {id,nama,kelas,kelompok:String(d.identitas.kelompok||""),tanggal:String(d.identitas.tanggal||""),waktu:String(d.waktu_ekspor||""),progres:Number(d.progres_pengisian_persen)||0,kuis:d.kuis||{},jawaban:d.jawaban||{},filename:filename||"file JSON",impor:new Date().toISOString(),raw:d};
+}
+function render(){
+ $("total").textContent=submissions.length;
+ $("classes").textContent=new Set(submissions.map(x=>x.kelas)).size;
+ $("avg").textContent=(submissions.length?Math.round(submissions.reduce((a,x)=>a+x.progres,0)/submissions.length):0)+"%";
+ $("quiz").textContent=submissions.filter(x=>x.kuis.status==="Dijawab lengkap").length;
+ const selected=$("classFilter").value, classes=[...new Set(submissions.map(x=>x.kelas))].sort();
+ $("classFilter").innerHTML='<option value="">Semua kelas</option>'+classes.map(c=>'<option value="'+safe(c)+'">'+safe(c)+'</option>').join("");
+ $("classFilter").value=classes.includes(selected)?selected:"";
+ let list=submissions.filter(x=>(!$("classFilter").value||x.kelas===$("classFilter").value)&&(`${x.nama} ${x.kelompok}`.toLowerCase().includes($("search").value.toLowerCase())));
+ if($("sort").value==="name")list.sort((a,b)=>a.nama.localeCompare(b.nama,"id"));
+ else if($("sort").value==="progress")list.sort((a,b)=>b.progres-a.progres);
+ else list.sort((a,b)=>b.impor.localeCompare(a.impor));
+ $("rows").innerHTML=list.map(x=>`<tr><td><strong>${safe(x.nama)}</strong></td><td>${safe(x.kelas)}<br><span class="muted">${safe(x.kelompok||"—")}</span></td><td>${safe(x.tanggal||"—")}</td><td><span class="pill ${x.progres<100?"warn":""}">${x.progres}%</span></td><td>${x.kuis.skor==null?"—":safe(x.kuis.skor)+"/"+safe(x.kuis.skor_maksimal??2)}</td><td><button class="rowbtn" data-id="${encodeURIComponent(x.id)}">Lihat</button></td></tr>`).join("");
+ $("empty").style.display=list.length?"none":"block";
+ $("status").textContent=`Menampilkan ${list.length} dari ${submissions.length} kiriman. Data tersimpan lokal di browser ini.`;
+ document.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>showDetail(decodeURIComponent(b.dataset.id))));
+ renderAnalysis();
+}
+function showDetail(id){
+ const x=submissions.find(s=>s.id===id);if(!x)return;activeId=id;
+ $("detailTitle").textContent=x.nama+" — "+x.kelas;
+ const labels={ternak:"Nama/ID ternak",jenis:"Jenis/kelamin",kondisi:"Kondisi umum",catatan:"Catatan observasi",ld:"Lingkar dada (cm)",pb:"Panjang badan (cm)",umur:"Umur ternak (tahun)",hasilbobot:"Estimasi bobot (kg)",analisis1:"Analisis 1",analisis2:"Analisis 2",analisis3:"Analisis 3",jawabstem:"Tantangan STEM",teliti:"Asesmen: ketelitian",paham:"Asesmen: pemahaman",q1:"Jawaban kuis 1",q2:"Jawaban kuis 2",ref1:"Refleksi 1",ref2:"Refleksi 2",ref3:"Refleksi 3"};
+ let html=`<div class="detailgrid"><div class="detail"><b>Nama</b>${safe(x.nama)}</div><div class="detail"><b>Kelas</b>${safe(x.kelas)}</div><div class="detail"><b>Kelompok</b>${safe(x.kelompok||"—")}</div><div class="detail"><b>Tanggal LKPD</b>${safe(x.tanggal||"—")}</div><div class="detail"><b>Progres pengisian</b>${x.progres}%</div><div class="detail"><b>Skor kuis</b>${x.kuis.skor==null?"Belum lengkap":safe(x.kuis.skor)+"/"+safe(x.kuis.skor_maksimal??2)}</div></div><h3>Jawaban siswa</h3><div class="detailgrid">`;
+ for(const [k,label] of Object.entries(labels))html+=`<div class="detail"><b>${safe(label)}</b>${safe(x.jawaban[k]||"—")}</div>`;
+ html+=`</div><p class="small">File asal: ${safe(x.filename)} · Diimpor: ${safe(new Date(x.impor).toLocaleString("id-ID"))}</p>`;
+ $("detailBody").innerHTML=html;$("detailDialog").showModal();
+}
+$("files").addEventListener("change",async e=>{
+ let ok=0,fail=[];
+ for(const f of e.target.files){try{const d=JSON.parse(await f.text()),x=normalize(d,f.name);const i=submissions.findIndex(s=>s.id===x.id);if(i>=0)submissions[i]=x;else submissions.push(x);ok++}catch(err){fail.push(f.name+": "+err.message)}}
+ save();render();$("status").textContent=`Berhasil memproses ${ok} file. ${fail.length? "Gagal: "+fail.join(" | "):"Semua file valid."}`;e.target.value="";
+});
+$("search").addEventListener("input",render);$("classFilter").addEventListener("change",render);$("sort").addEventListener("change",render);
+$("csvBtn").onclick=()=>{
+ const cols=["Nama","Kelas","Kelompok","Tanggal LKPD","Progres (%)","Skor kuis","Status kuis","Nama/ID ternak","Lingkar dada","Panjang badan","Umur","Estimasi bobot","Analisis 1","Analisis 2","Analisis 3","Tantangan STEM","Refleksi 1","Refleksi 2","Refleksi 3"];
+ const keys=["nama","kelas","kelompok","tanggal","progres","kuis.skor","kuis.status","jawaban.ternak","jawaban.ld","jawaban.pb","jawaban.umur","jawaban.hasilbobot","jawaban.analisis1","jawaban.analisis2","jawaban.analisis3","jawaban.jawabstem","jawaban.ref1","jawaban.ref2","jawaban.ref3"];
+ const val=(o,k)=>k.split(".").reduce((a,b)=>a?.[b],o)??"";
+ const q=v=>'"'+String(v).replace(/"/g,'""').replace(/\r?\n/g," ")+'"';
+ const csv="\uFEFF"+[cols.map(q).join(";"),...submissions.map(s=>keys.map(k=>q(val(s,k))).join(";"))].join("\r\n");
+ download(csv,"Rekap_ATR_INTERACTIVE_LAB.csv","text/csv;charset=utf-8");
+};
+$("backupBtn").onclick=()=>download(JSON.stringify({aplikasi:"ATR Dashboard Guru",versi:1,ekspor:new Date().toISOString(),data:submissions},null,2),"Cadangan_Dashboard_ATR.json","application/json");
+$("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.aplikasi!=="ATR Dashboard Guru"||!Array.isArray(d.data))throw Error("Bukan file cadangan dashboard.");if(!confirm("Pulihkan cadangan? Data saat ini akan diganti."))return;submissions=d.data;save();render();alert("Cadangan berhasil dipulihkan.")}catch(err){alert("Tidak dapat memulihkan: "+err.message)}e.target.value=""});
+function download(content,name,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
+$("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dari browser ini? Pastikan sudah membuat cadangan.")){submissions=[];save();render()}}
+$("closeDialog").onclick=()=>$("detailDialog").close();
+$("deleteOne").onclick=()=>{if(confirm("Hapus kiriman siswa ini dari dashboard?")){submissions=submissions.filter(x=>x.id!==activeId);save();render();$("detailDialog").close()}};
+
+function renderAnalysis(){
+ const scored=submissions.map(x=>{
+  const score=Number(x.kuis?.skor), max=Number(x.kuis?.skor_maksimal);
+  const valid=Number.isFinite(score)&&Number.isFinite(max)&&max>0&&x.kuis?.status==="Dijawab lengkap";
+  return {...x, nilai:valid?(score/max)*100:null};
+ });
+ const valid=scored.filter(x=>x.nilai!==null);
+ const passed=valid.filter(x=>x.nilai>=75);
+ const remedial=valid.filter(x=>x.nilai<75);
+ const avg=valid.length?valid.reduce((s,x)=>s+x.nilai,0)/valid.length:null;
+ $("aScored").textContent=valid.length;
+ $("aPassed").textContent=passed.length;
+ $("aRemedial").textContent=remedial.length;
+ $("aAverage").textContent=avg===null?"—":Math.round(avg)+"%";
+ const bands=[
+  {label:"Tuntas (≥75)",count:passed.length,cls:""},
+  {label:"Perlu remedial (<75)",count:remedial.length,cls:"low"},
+  {label:"Belum ada skor",count:scored.length-valid.length,cls:"warn"}
+ ];
+ const denominator=Math.max(scored.length,1);
+ $("analysisChart").innerHTML=scored.length?bands.map(b=>'<div class="chart-row"><span>'+b.label+'</span><div class="bar-track"><div class="bar-fill '+b.cls+'" style="width:'+(b.count/denominator*100)+'%"></div></div><b>'+b.count+'</b></div>').join(""):"Belum ada data siswa.";
+ const sorted=scored.slice().sort((a,b)=>(b.nilai??-1)-(a.nilai??-1));
+ $("analysisRows").innerHTML=sorted.length?sorted.map(x=>{
+  const status=x.nilai===null?'<span class="pill warn">Belum dinilai</span>':x.nilai>=75?'<span class="pill status-pass">Tuntas</span>':'<span class="pill status-remedial">Perlu remedial</span>';
+  return '<tr><td><strong>'+safe(x.nama)+'</strong></td><td>'+safe(x.kelas)+'</td><td>'+x.progres+'%</td><td>'+(x.nilai===null?'—':Math.round(x.nilai*10)/10)+'</td><td>'+status+'</td></tr>';
+ }).join(""):'<tr><td colspan="5" class="empty">Belum ada data siswa.</td></tr>';
+ $("analysisFoot").textContent='Dianalisis '+valid.length+' siswa yang memiliki skor kuis lengkap. '+(scored.length-valid.length)+' siswa belum memiliki skor kuis lengkap. KKTP: 75.';
+}
+
+load();render();renderAnalysis();
+</script>
+</body></html>
