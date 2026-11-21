@@ -43,6 +43,24 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
 .analysis-note{background:#eef6f5;border-left:4px solid var(--teal);padding:12px;border-radius:8px;font-size:13px;line-height:1.55;margin-bottom:12px}
 @media(max-width:720px){.analysis-grid{grid-template-columns:repeat(2,1fr)}.chart-row{grid-template-columns:100px 1fr 45px}}
 
+@media print{
+ body{background:#fff!important}
+ body *{visibility:hidden!important}
+ #printArea,#printArea *{visibility:visible!important}
+ #printArea{display:block!important;position:absolute;left:0;top:0;width:100%;padding:18px;color:#111;font-family:Arial,sans-serif}
+ #printArea h1{font-size:20px;color:#17324d;margin:0 0 6px}
+ #printArea h2{font-size:15px;margin:18px 0 8px;color:#17324d}
+ #printArea p{font-size:11px;margin:4px 0}
+ #printArea table{width:100%;border-collapse:collapse;min-width:0;margin:8px 0 14px}
+ #printArea th,#printArea td{border:1px solid #bbb;padding:6px;font-size:10px;color:#111}
+ #printArea th{background:#eee!important}
+ #printArea .report-kpis{display:flex;gap:16px;flex-wrap:wrap;margin:12px 0}
+ #printArea .report-kpis div{border:1px solid #aaa;padding:8px;min-width:110px;font-size:11px}
+ #printArea .report-kpis b{display:block;font-size:16px}
+}
+#printArea{display:none}
+
+
 </style>
 </head>
 <body>
@@ -96,6 +114,25 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
   <p class="small" id="analysisFoot">Analisis akan diperbarui otomatis setelah data JSON diimpor.</p>
  </section>
 
+ <section class="panel" id="reportPanel">
+  <h2>📄 Modul Laporan Penilaian Guru</h2>
+  <p class="small">Laporan dibuat dari data yang tersimpan pada browser ini. Pilih kelas untuk menyusun rekap, daftar remedial, dan daftar pengayaan. Gunakan tombol cetak untuk menyimpan sebagai PDF melalui fitur Print browser.</p>
+  <div class="filters" style="grid-template-columns:1fr auto">
+   <select id="reportClass"><option value="">Semua kelas</option></select>
+   <button class="primary" id="printReport">🖨 Cetak / Simpan PDF</button>
+  </div>
+  <div class="analysis-grid">
+   <div class="analysis-card"><span>Jumlah siswa</span><strong id="rTotal">0</strong></div>
+   <div class="analysis-card"><span>Tuntas</span><strong id="rPassed">0</strong></div>
+   <div class="analysis-card"><span>Perlu remedial</span><strong id="rRemedial">0</strong></div>
+   <div class="analysis-card"><span>Belum dinilai</span><strong id="rPending">0</strong></div>
+  </div>
+  <h3 style="font-size:15px;color:var(--navy)">Rekap nilai individual</h3>
+  <div class="tablewrap"><table style="min-width:650px"><thead><tr><th>No.</th><th>Nama siswa</th><th>Kelas</th><th>Progres LKPD</th><th>Nilai kuis</th><th>Status</th><th>Tindak lanjut</th></tr></thead><tbody id="reportRows"><tr><td colspan="7" class="empty">Belum ada data siswa.</td></tr></tbody></table></div>
+  <div class="analysis-note" id="reportRecommendation">Impor data siswa untuk membuat rekomendasi tindak lanjut.</div>
+ </section>
+ <section id="printArea" aria-hidden="true"></section>
+
  <footer>ATR-INTERACTIVE LAB · Dashboard Guru · Pengembang: Yoti Endrianis, A.Md., S.Pd., Gr. · #buguruyotie.ai</footer>
 </main>
 <dialog id="detailDialog">
@@ -134,6 +171,7 @@ function render(){
  $("status").textContent=`Menampilkan ${list.length} dari ${submissions.length} kiriman. Data tersimpan lokal di browser ini.`;
  document.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>showDetail(decodeURIComponent(b.dataset.id))));
  renderAnalysis();
+ renderReport();
 }
 function showDetail(id){
  const x=submissions.find(s=>s.id===id);if(!x)return;activeId=id;
@@ -165,6 +203,54 @@ $("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dari browser i
 $("closeDialog").onclick=()=>$("detailDialog").close();
 $("deleteOne").onclick=()=>{if(confirm("Hapus kiriman siswa ini dari dashboard?")){submissions=submissions.filter(x=>x.id!==activeId);save();render();$("detailDialog").close()}};
 
+
+function reportStudents(){
+ const selected=$("reportClass").value;
+ return submissions.filter(x=>!selected||x.kelas===selected).map(x=>{
+  const score=Number(x.kuis?.skor),max=Number(x.kuis?.skor_maksimal);
+  const valid=Number.isFinite(score)&&Number.isFinite(max)&&max>0&&x.kuis?.status==="Dijawab lengkap";
+  const nilai=valid?(score/max)*100:null;
+  return {...x,nilai,status:nilai===null?"Belum dinilai":nilai>=75?"Tuntas":"Perlu remedial"};
+ }).sort((a,b)=>a.nama.localeCompare(b.nama,"id"));
+}
+function renderReport(){
+ const classes=[...new Set(submissions.map(x=>x.kelas))].sort();
+ const selected=$("reportClass").value;
+ $("reportClass").innerHTML='<option value="">Semua kelas</option>'+classes.map(x=>'<option value="'+safe(x)+'">'+safe(x)+'</option>').join("");
+ $("reportClass").value=classes.includes(selected)?selected:"";
+ const list=reportStudents();
+ const passed=list.filter(x=>x.status==="Tuntas"), remedial=list.filter(x=>x.status==="Perlu remedial"), pending=list.filter(x=>x.status==="Belum dinilai");
+ $("rTotal").textContent=list.length;$("rPassed").textContent=passed.length;$("rRemedial").textContent=remedial.length;$("rPending").textContent=pending.length;
+ $("reportRows").innerHTML=list.length?list.map((x,i)=>{
+  const follow=x.status==="Perlu remedial"?"Remedial":x.status==="Tuntas"?"Pengayaan":"Lengkapi penilaian";
+  const val=x.nilai===null?"—":(Math.round(x.nilai*10)/10).toString();
+  const cls=x.status==="Tuntas"?"status-pass":x.status==="Perlu remedial"?"status-remedial":"warn";
+  return '<tr><td>'+(i+1)+'</td><td><strong>'+safe(x.nama)+'</strong></td><td>'+safe(x.kelas)+'</td><td>'+x.progres+'%</td><td>'+val+'</td><td><span class="pill '+cls+'">'+x.status+'</span></td><td>'+follow+'</td></tr>';
+ }).join(""):'<tr><td colspan="7" class="empty">Belum ada data siswa.</td></tr>';
+ const avg=list.filter(x=>x.nilai!==null);
+ const average=avg.length?avg.reduce((s,x)=>s+x.nilai,0)/avg.length:null;
+ $("reportRecommendation").innerHTML=list.length?
+  '<b>Rekomendasi tindak lanjut:</b> '+remedial.length+' siswa mengikuti remedial dan pembelajaran ulang pada indikator yang belum dikuasai; '+passed.length+' siswa mengikuti pengayaan atau tantangan lanjutan; '+pending.length+' siswa perlu melengkapi kuis/penilaian. Rata-rata nilai dari '+avg.length+' siswa yang memiliki skor lengkap: '+(average===null?"—":(Math.round(average*10)/10))+'%.':
+  'Impor data siswa untuk membuat rekomendasi tindak lanjut.';
+}
+function printTeacherReport(){
+ const list=reportStudents(),passed=list.filter(x=>x.status==="Tuntas"),remedial=list.filter(x=>x.status==="Perlu remedial"),pending=list.filter(x=>x.status==="Belum dinilai");
+ const scored=list.filter(x=>x.nilai!==null),average=scored.length?scored.reduce((s,x)=>s+x.nilai,0)/scored.length:null;
+ const kelas=$("reportClass").value||"Semua kelas";
+ const rows=list.map((x,i)=>'<tr><td>'+(i+1)+'</td><td>'+safe(x.nama)+'</td><td>'+safe(x.kelas)+'</td><td>'+x.progres+'%</td><td>'+(x.nilai===null?"—":(Math.round(x.nilai*10)/10))+'</td><td>'+x.status+'</td><td>'+(x.status==="Perlu remedial"?"Remedial":x.status==="Tuntas"?"Pengayaan":"Lengkapi penilaian")+'</td></tr>').join("");
+ const names=(arr)=>arr.length?arr.map(x=>safe(x.nama)).join(", "):"—";
+ $("printArea").innerHTML='<h1>LAPORAN HASIL PENILAIAN PEMBELAJARAN</h1><p><b>ATR-INTERACTIVE LAB · SMK Negeri 2 Kerinci</b></p><p>Mata pelajaran/konsentrasi: Agribisnis Ternak Ruminansia · Materi: Menentukan Bobot Badan Sapi</p><p>Kelas: '+safe(kelas)+' · Tanggal cetak: '+new Date().toLocaleDateString("id-ID")+' · KKTP: 75</p>'+
+ '<div class="report-kpis"><div><b>'+list.length+'</b>Jumlah siswa</div><div><b>'+passed.length+'</b>Tuntas</div><div><b>'+remedial.length+'</b>Perlu remedial</div><div><b>'+pending.length+'</b>Belum dinilai</div><div><b>'+(average===null?"—":Math.round(average*10)/10+"%")+'</b>Rata-rata nilai</div></div>'+
+ '<h2>A. Rekap nilai individual</h2><table><thead><tr><th>No.</th><th>Nama siswa</th><th>Kelas</th><th>Progres LKPD</th><th>Nilai</th><th>Status KKTP</th><th>Tindak lanjut</th></tr></thead><tbody>'+rows+'</tbody></table>'+
+ '<h2>B. Daftar siswa remedial</h2><p>'+names(remedial)+'</p><h2>C. Daftar siswa pengayaan</h2><p>'+names(passed)+'</p><h2>D. Siswa yang belum dinilai</h2><p>'+names(pending)+'</p>'+
+ '<h2>E. Catatan tindak lanjut</h2><p>Siswa yang belum mencapai KKTP 75 diberikan pembelajaran ulang/remedial sesuai indikator yang belum dikuasai dan mengikuti penilaian ulang. Siswa yang telah tuntas diberikan pengayaan atau tantangan lanjutan. Siswa yang belum memiliki skor kuis lengkap perlu menyelesaikan penilaian.</p>'+
+ '<p style="margin-top:35px;text-align:right">Guru Mata Pelajaran,<br><br><br><b>Yoti Endrianis, A.Md., S.Pd., Gr.</b></p>';
+ window.print();
+}
+$("reportClass").addEventListener("change",renderReport);
+$("printReport").addEventListener("click",printTeacherReport);
+
+
 function renderAnalysis(){
  const scored=submissions.map(x=>{
   const score=Number(x.kuis?.skor), max=Number(x.kuis?.skor_maksimal);
@@ -194,6 +280,6 @@ function renderAnalysis(){
  $("analysisFoot").textContent='Dianalisis '+valid.length+' siswa yang memiliki skor kuis lengkap. '+(scored.length-valid.length)+' siswa belum memiliki skor kuis lengkap. KKTP: 75.';
 }
 
-load();render();renderAnalysis();
+load();render();renderAnalysis();renderReport();
 </script>
 </body></html>
