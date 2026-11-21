@@ -219,9 +219,9 @@ $("csvBtn").onclick=()=>{
 $("backupBtn").onclick=()=>download(JSON.stringify({aplikasi:"ATR Dashboard Guru",versi:2,ekspor:new Date().toISOString(),data:submissions,tindakLanjut:followups},null,2),"Cadangan_Dashboard_ATR.json","application/json");
 $("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.aplikasi!=="ATR Dashboard Guru"||!Array.isArray(d.data))throw Error("Bukan file cadangan dashboard.");if(!confirm("Pulihkan cadangan? Data saat ini akan diganti."))return;submissions=d.data;followups=d.tindakLanjut&&typeof d.tindakLanjut==="object"?d.tindakLanjut:{};save();render();alert("Cadangan berhasil dipulihkan.")}catch(err){alert("Tidak dapat memulihkan: "+err.message)}e.target.value=""});
 function download(content,name,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-$("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dari browser ini? Pastikan sudah membuat cadangan.")){submissions=[];save();render()}}
+$("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dan catatan tindak lanjut dari browser ini? Pastikan sudah membuat cadangan.")){submissions=[];followups={};save();render()}}
 $("closeDialog").onclick=()=>$("detailDialog").close();
-$("deleteOne").onclick=()=>{if(confirm("Hapus kiriman siswa ini dari dashboard?")){submissions=submissions.filter(x=>x.id!==activeId);save();render();$("detailDialog").close()}};
+$("deleteOne").onclick=()=>{if(confirm("Hapus kiriman siswa ini dari dashboard?")){submissions=submissions.filter(x=>x.id!==activeId);delete followups[activeId];save();render();$("detailDialog").close()}};
 
 
 function reportStudents(){
