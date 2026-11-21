@@ -60,6 +60,12 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
 }
 #printArea{display:none}
 
+.followup-table{min-width:900px}
+.followup-table input,.followup-table select{min-width:125px;padding:8px;font-size:12px}
+.followup-table .note-input{min-width:190px}
+.followup-status{font-size:12px;color:var(--muted);margin-top:8px}
+
+
 
 </style>
 </head>
@@ -131,6 +137,18 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
   <div class="tablewrap"><table style="min-width:650px"><thead><tr><th>No.</th><th>Nama siswa</th><th>Kelas</th><th>Progres LKPD</th><th>Nilai kuis</th><th>Status</th><th>Tindak lanjut</th></tr></thead><tbody id="reportRows"><tr><td colspan="7" class="empty">Belum ada data siswa.</td></tr></tbody></table></div>
   <div class="analysis-note" id="reportRecommendation">Impor data siswa untuk membuat rekomendasi tindak lanjut.</div>
  </section>
+ <section class="panel" id="followupPanel">
+  <h2>🧭 Manajemen Tindak Lanjut Pembelajaran</h2>
+  <p class="small">Catat pelaksanaan remedial bagi siswa yang belum mencapai KKTP 75 dan pengayaan bagi siswa yang sudah tuntas. Catatan tersimpan lokal pada browser guru ini.</p>
+  <div class="analysis-grid">
+   <div class="analysis-card"><span>Perlu tindak lanjut</span><strong id="fTotal">0</strong></div>
+   <div class="analysis-card"><span>Belum dilakukan</span><strong id="fPending">0</strong></div>
+   <div class="analysis-card"><span>Terjadwal</span><strong id="fScheduled">0</strong></div>
+   <div class="analysis-card"><span>Sudah dilakukan</span><strong id="fDone">0</strong></div>
+  </div>
+  <div class="tablewrap"><table class="followup-table"><thead><tr><th>Nama siswa</th><th>Nilai</th><th>Rekomendasi</th><th>Status tindak lanjut</th><th>Tanggal</th><th>Catatan guru</th><th>Aksi</th></tr></thead><tbody id="followupRows"><tr><td colspan="7" class="empty">Belum ada data siswa.</td></tr></tbody></table></div>
+  <p class="followup-status" id="followupStatus" aria-live="polite">Perubahan akan disimpan pada browser ini setelah tombol Simpan ditekan.</p>
+ </section>
  <section id="printArea" aria-hidden="true"></section>
 
  <footer>ATR-INTERACTIVE LAB · Dashboard Guru · Pengembang: Yoti Endrianis, A.Md., S.Pd., Gr. · #buguruyotie.ai</footer>
@@ -142,11 +160,12 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
 </dialog>
 <script>
 const STORE="atr_dashboard_guru_v1";
-let submissions=[], activeId=null;
+const FOLLOW_STORE="atr_dashboard_followups_v1";
+let submissions=[], followups={}, activeId=null;
 const $=id=>document.getElementById(id);
 function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])).replace(/\n/g,"<br>")}
-function load(){try{submissions=JSON.parse(localStorage.getItem(STORE)||"[]");if(!Array.isArray(submissions))submissions=[]}catch(e){submissions=[]}}
-function save(){localStorage.setItem(STORE,JSON.stringify(submissions))}
+function load(){try{submissions=JSON.parse(localStorage.getItem(STORE)||"[]");if(!Array.isArray(submissions))submissions=[]}catch(e){submissions=[]}try{followups=JSON.parse(localStorage.getItem(FOLLOW_STORE)||"{}");if(!followups||typeof followups!=="object"||Array.isArray(followups))followups={}}catch(e){followups={}}}
+function save(){localStorage.setItem(STORE,JSON.stringify(submissions));localStorage.setItem(FOLLOW_STORE,JSON.stringify(followups))}
 function normalize(d,filename){
  if(!d||typeof d!=="object"||!d.identitas||!d.jawaban||d.aplikasi!=="ATR-INTERACTIVE LAB")throw Error("Format file bukan hasil ekspor ATR-INTERACTIVE LAB.");
  const nama=String(d.identitas.nama||"").trim(), kelas=String(d.identitas.kelas||"").trim();
@@ -172,6 +191,7 @@ function render(){
  document.querySelectorAll("[data-id]").forEach(b=>b.addEventListener("click",()=>showDetail(decodeURIComponent(b.dataset.id))));
  renderAnalysis();
  renderReport();
+ renderFollowups();
 }
 function showDetail(id){
  const x=submissions.find(s=>s.id===id);if(!x)return;activeId=id;
@@ -196,8 +216,8 @@ $("csvBtn").onclick=()=>{
  const csv="\uFEFF"+[cols.map(q).join(";"),...submissions.map(s=>keys.map(k=>q(val(s,k))).join(";"))].join("\r\n");
  download(csv,"Rekap_ATR_INTERACTIVE_LAB.csv","text/csv;charset=utf-8");
 };
-$("backupBtn").onclick=()=>download(JSON.stringify({aplikasi:"ATR Dashboard Guru",versi:1,ekspor:new Date().toISOString(),data:submissions},null,2),"Cadangan_Dashboard_ATR.json","application/json");
-$("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.aplikasi!=="ATR Dashboard Guru"||!Array.isArray(d.data))throw Error("Bukan file cadangan dashboard.");if(!confirm("Pulihkan cadangan? Data saat ini akan diganti."))return;submissions=d.data;save();render();alert("Cadangan berhasil dipulihkan.")}catch(err){alert("Tidak dapat memulihkan: "+err.message)}e.target.value=""});
+$("backupBtn").onclick=()=>download(JSON.stringify({aplikasi:"ATR Dashboard Guru",versi:2,ekspor:new Date().toISOString(),data:submissions,tindakLanjut:followups},null,2),"Cadangan_Dashboard_ATR.json","application/json");
+$("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.aplikasi!=="ATR Dashboard Guru"||!Array.isArray(d.data))throw Error("Bukan file cadangan dashboard.");if(!confirm("Pulihkan cadangan? Data saat ini akan diganti."))return;submissions=d.data;followups=d.tindakLanjut&&typeof d.tindakLanjut==="object"?d.tindakLanjut:{};save();render();alert("Cadangan berhasil dipulihkan.")}catch(err){alert("Tidak dapat memulihkan: "+err.message)}e.target.value=""});
 function download(content,name,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
 $("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dari browser ini? Pastikan sudah membuat cadangan.")){submissions=[];save();render()}}
 $("closeDialog").onclick=()=>$("detailDialog").close();
@@ -233,6 +253,28 @@ function renderReport(){
   '<b>Rekomendasi tindak lanjut:</b> '+remedial.length+' siswa mengikuti remedial dan pembelajaran ulang pada indikator yang belum dikuasai; '+passed.length+' siswa mengikuti pengayaan atau tantangan lanjutan; '+pending.length+' siswa perlu melengkapi kuis/penilaian. Rata-rata nilai dari '+avg.length+' siswa yang memiliki skor lengkap: '+(average===null?"—":(Math.round(average*10)/10))+'%.':
   'Impor data siswa untuk membuat rekomendasi tindak lanjut.';
 }
+
+function renderFollowups(){
+ const list=reportStudents().filter(x=>x.status==="Perlu remedial"||x.status==="Tuntas");
+ const pending=list.filter(x=>!followups[x.id]||!followups[x.id].status||followups[x.id].status==="Belum dilakukan");
+ const scheduled=list.filter(x=>followups[x.id]?.status==="Terjadwal");
+ const done=list.filter(x=>followups[x.id]?.status==="Sudah dilakukan");
+ $("fTotal").textContent=list.length;$("fPending").textContent=pending.length;$("fScheduled").textContent=scheduled.length;$("fDone").textContent=done.length;
+ $("followupRows").innerHTML=list.length?list.map(x=>{
+  const rec=x.status==="Perlu remedial"?"Remedial":"Pengayaan";
+  const f=followups[x.id]||{};
+  const opts=["Belum dilakukan","Terjadwal","Sudah dilakukan","Perlu evaluasi ulang"];
+  return '<tr><td><strong>'+safe(x.nama)+'</strong><br><span class="muted">'+safe(x.kelas)+'</span></td><td>'+Math.round(x.nilai*10)/10+'</td><td><span class="pill '+(rec==="Remedial"?"status-remedial":"status-pass")+'">'+rec+'</span></td><td><select id="fs_'+encodeURIComponent(x.id)+'">'+opts.map(o=>'<option '+((f.status||"Belum dilakukan")===o?"selected":"")+'>'+o+'</option>').join("")+'</select></td><td><input type="date" id="fd_'+encodeURIComponent(x.id)+'" value="'+safe(f.tanggal||"")+'"></td><td><input class="note-input" id="fn_'+encodeURIComponent(x.id)+'" type="text" placeholder="Materi/hasil tindak lanjut" value="'+safe(f.catatan||"")+'"></td><td><button class="rowbtn" data-save-follow="'+encodeURIComponent(x.id)+'">Simpan</button></td></tr>';
+ }).join(""):'<tr><td colspan="7" class="empty">Belum ada siswa yang memerlukan remedial atau pengayaan. Impor data siswa dan pastikan hasil kuis sudah tersedia.</td></tr>';
+ document.querySelectorAll("[data-save-follow]").forEach(b=>b.addEventListener("click",()=>{
+  const id=decodeURIComponent(b.dataset.saveFollow);
+  const key=encodeURIComponent(id);
+  followups[id]={status:$("fs_"+key).value,tanggal:$("fd_"+key).value,catatan:$("fn_"+key).value,updated:new Date().toISOString()};
+  save();renderFollowups();
+  $("followupStatus").textContent="Catatan tindak lanjut "+(submissions.find(s=>s.id===id)?.nama||"siswa")+" berhasil disimpan pada browser ini.";
+ }));
+}
+
 function printTeacherReport(){
  const list=reportStudents(),passed=list.filter(x=>x.status==="Tuntas"),remedial=list.filter(x=>x.status==="Perlu remedial"),pending=list.filter(x=>x.status==="Belum dinilai");
  const scored=list.filter(x=>x.nilai!==null),average=scored.length?scored.reduce((s,x)=>s+x.nilai,0)/scored.length:null;
@@ -280,6 +322,6 @@ function renderAnalysis(){
  $("analysisFoot").textContent='Dianalisis '+valid.length+' siswa yang memiliki skor kuis lengkap. '+(scored.length-valid.length)+' siswa belum memiliki skor kuis lengkap. KKTP: 75.';
 }
 
-load();render();renderAnalysis();renderReport();
+load();render();renderAnalysis();renderReport();renderFollowups();
 </script>
 </body></html>
