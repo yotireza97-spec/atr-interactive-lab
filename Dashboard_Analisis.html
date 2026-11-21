@@ -64,6 +64,7 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
 .followup-table input,.followup-table select{min-width:125px;padding:8px;font-size:12px}
 .followup-table .note-input{min-width:190px}
 .followup-status{font-size:12px;color:var(--muted);margin-top:8px}
+.evaluation-table{min-width:850px}.evaluation-table input{min-width:110px;padding:8px;font-size:12px}.evaluation-table .eval-note{min-width:180px}
 
 
 
@@ -149,6 +150,18 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
   <div class="tablewrap"><table class="followup-table"><thead><tr><th>Nama siswa</th><th>Nilai</th><th>Rekomendasi</th><th>Status tindak lanjut</th><th>Tanggal</th><th>Catatan guru</th><th>Aksi</th></tr></thead><tbody id="followupRows"><tr><td colspan="7" class="empty">Belum ada data siswa.</td></tr></tbody></table></div>
   <p class="followup-status" id="followupStatus" aria-live="polite">Perubahan akan disimpan pada browser ini setelah tombol Simpan ditekan.</p>
  </section>
+ <section class="panel" id="evaluationPanel">
+  <h2>📈 Analisis Perkembangan dan Evaluasi Remedial</h2>
+  <p class="small">Nilai awal diambil dari hasil kuis pertama yang tersimpan untuk setiap siswa. Setelah remedial, masukkan nilai penilaian ulang. Dashboard menghitung peningkatan nilai dan ketercapaian KKTP 75.</p>
+  <div class="analysis-grid">
+   <div class="analysis-card"><span>Siswa perlu remedial</span><strong id="eTotal">0</strong></div>
+   <div class="analysis-card"><span>Sudah evaluasi ulang</span><strong id="eEvaluated">0</strong></div>
+   <div class="analysis-card"><span>Mencapai KKTP setelah remedial</span><strong id="ePassed">0</strong></div>
+   <div class="analysis-card"><span>Rata-rata peningkatan</span><strong id="eGain">—</strong></div>
+  </div>
+  <div class="tablewrap"><table class="evaluation-table"><thead><tr><th>Nama siswa</th><th>Kelas</th><th>Nilai awal</th><th>Nilai setelah remedial</th><th>Tanggal evaluasi</th><th>Catatan</th><th>Hasil</th><th>Aksi</th></tr></thead><tbody id="evaluationRows"><tr><td colspan="8" class="empty">Belum ada siswa yang perlu dievaluasi.</td></tr></tbody></table></div>
+  <p class="followup-status" id="evaluationStatus" aria-live="polite">Isi nilai evaluasi ulang, lalu tekan Simpan.</p>
+ </section>
  <section id="printArea" aria-hidden="true"></section>
 
  <footer>ATR-INTERACTIVE LAB · Dashboard Guru · Pengembang: Yoti Endrianis, A.Md., S.Pd., Gr. · #buguruyotie.ai</footer>
@@ -161,11 +174,12 @@ dialog::backdrop{background:#10283b88}.modalhead{padding:17px 20px;background:#e
 <script>
 const STORE="atr_dashboard_guru_v1";
 const FOLLOW_STORE="atr_dashboard_followups_v1";
-let submissions=[], followups={}, activeId=null;
+const EVAL_STORE="atr_dashboard_remedial_eval_v1";
+let submissions=[], followups={}, evaluations={}, activeId=null;
 const $=id=>document.getElementById(id);
 function safe(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])).replace(/\n/g,"<br>")}
-function load(){try{submissions=JSON.parse(localStorage.getItem(STORE)||"[]");if(!Array.isArray(submissions))submissions=[]}catch(e){submissions=[]}try{followups=JSON.parse(localStorage.getItem(FOLLOW_STORE)||"{}");if(!followups||typeof followups!=="object"||Array.isArray(followups))followups={}}catch(e){followups={}}}
-function save(){localStorage.setItem(STORE,JSON.stringify(submissions));localStorage.setItem(FOLLOW_STORE,JSON.stringify(followups))}
+function load(){try{submissions=JSON.parse(localStorage.getItem(STORE)||"[]");if(!Array.isArray(submissions))submissions=[]}catch(e){submissions=[]}try{followups=JSON.parse(localStorage.getItem(FOLLOW_STORE)||"{}");if(!followups||typeof followups!=="object"||Array.isArray(followups))followups={}}catch(e){followups={}}try{evaluations=JSON.parse(localStorage.getItem(EVAL_STORE)||"{}");if(!evaluations||typeof evaluations!=="object"||Array.isArray(evaluations))evaluations={}}catch(e){evaluations={}}}
+function save(){localStorage.setItem(STORE,JSON.stringify(submissions));localStorage.setItem(FOLLOW_STORE,JSON.stringify(followups));localStorage.setItem(EVAL_STORE,JSON.stringify(evaluations))}
 function normalize(d,filename){
  if(!d||typeof d!=="object"||!d.identitas||!d.jawaban||d.aplikasi!=="ATR-INTERACTIVE LAB")throw Error("Format file bukan hasil ekspor ATR-INTERACTIVE LAB.");
  const nama=String(d.identitas.nama||"").trim(), kelas=String(d.identitas.kelas||"").trim();
@@ -192,6 +206,7 @@ function render(){
  renderAnalysis();
  renderReport();
  renderFollowups();
+ renderEvaluation();
 }
 function showDetail(id){
  const x=submissions.find(s=>s.id===id);if(!x)return;activeId=id;
@@ -216,10 +231,10 @@ $("csvBtn").onclick=()=>{
  const csv="\uFEFF"+[cols.map(q).join(";"),...submissions.map(s=>keys.map(k=>q(val(s,k))).join(";"))].join("\r\n");
  download(csv,"Rekap_ATR_INTERACTIVE_LAB.csv","text/csv;charset=utf-8");
 };
-$("backupBtn").onclick=()=>download(JSON.stringify({aplikasi:"ATR Dashboard Guru",versi:2,ekspor:new Date().toISOString(),data:submissions,tindakLanjut:followups},null,2),"Cadangan_Dashboard_ATR.json","application/json");
-$("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.aplikasi!=="ATR Dashboard Guru"||!Array.isArray(d.data))throw Error("Bukan file cadangan dashboard.");if(!confirm("Pulihkan cadangan? Data saat ini akan diganti."))return;submissions=d.data;followups=d.tindakLanjut&&typeof d.tindakLanjut==="object"?d.tindakLanjut:{};save();render();alert("Cadangan berhasil dipulihkan.")}catch(err){alert("Tidak dapat memulihkan: "+err.message)}e.target.value=""});
+$("backupBtn").onclick=()=>download(JSON.stringify({aplikasi:"ATR Dashboard Guru",versi:3,ekspor:new Date().toISOString(),data:submissions,tindakLanjut:followups,evaluasiRemedial:evaluations},null,2),"Cadangan_Dashboard_ATR.json","application/json");
+$("restoreFile").addEventListener("change",async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(d.aplikasi!=="ATR Dashboard Guru"||!Array.isArray(d.data))throw Error("Bukan file cadangan dashboard.");if(!confirm("Pulihkan cadangan? Data saat ini akan diganti."))return;submissions=d.data;followups=d.tindakLanjut&&typeof d.tindakLanjut==="object"?d.tindakLanjut:{};evaluations=d.evaluasiRemedial&&typeof d.evaluasiRemedial==="object"?d.evaluasiRemedial:{};save();render();alert("Cadangan berhasil dipulihkan.")}catch(err){alert("Tidak dapat memulihkan: "+err.message)}e.target.value=""});
 function download(content,name,type){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=name;a.click();URL.revokeObjectURL(url)}
-$("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dan catatan tindak lanjut dari browser ini? Pastikan sudah membuat cadangan.")){submissions=[];followups={};save();render()}}
+$("clearBtn").onclick=()=>{if(confirm("Hapus SELURUH data kiriman dan catatan tindak lanjut dari browser ini? Pastikan sudah membuat cadangan.")){submissions=[];followups={};evaluations={};save();render()}}
 $("closeDialog").onclick=()=>$("detailDialog").close();
 $("deleteOne").onclick=()=>{if(confirm("Hapus kiriman siswa ini dari dashboard?")){submissions=submissions.filter(x=>x.id!==activeId);delete followups[activeId];save();render();$("detailDialog").close()}};
 
@@ -275,6 +290,48 @@ function renderFollowups(){
  }));
 }
 
+function studentKey(x){return (String(x.nama||"").trim().toLowerCase()+"|"+String(x.kelas||"").trim().toLowerCase())}
+function initialRemedialStudents(){
+ const firstByStudent=new Map();
+ submissions.slice().sort((a,b)=>String(a.impor||"").localeCompare(String(b.impor||""))).forEach(x=>{
+  const score=Number(x.kuis?.skor),max=Number(x.kuis?.skor_maksimal);
+  if(!Number.isFinite(score)||!Number.isFinite(max)||max<=0||x.kuis?.status!=="Dijawab lengkap")return;
+  const key=studentKey(x);
+  if(!firstByStudent.has(key))firstByStudent.set(key,{key,nama:x.nama,kelas:x.kelas,nilaiAwal:score/max*100});
+ });
+ return [...firstByStudent.values()].filter(x=>x.nilaiAwal<75).sort((a,b)=>a.nama.localeCompare(b.nama,"id"));
+}
+function renderEvaluation(){
+ const students=initialRemedialStudents();
+ const evaluated=students.filter(x=>evaluations[x.key]&&Number.isFinite(Number(evaluations[x.key].nilaiAkhir)));
+ const passed=evaluated.filter(x=>Number(evaluations[x.key].nilaiAkhir)>=75);
+ const gains=evaluated.map(x=>Number(evaluations[x.key].nilaiAkhir)-Number(evaluations[x.key].nilaiAwal));
+ const avgGain=gains.length?gains.reduce((a,b)=>a+b,0)/gains.length:null;
+ $("eTotal").textContent=students.length;
+ $("eEvaluated").textContent=evaluated.length;
+ $("ePassed").textContent=passed.length;
+ $("eGain").textContent=avgGain===null?"—":(avgGain>0?"+":"")+Math.round(avgGain*10)/10;
+ $("evaluationRows").innerHTML=students.length?students.map(x=>{
+  const e=evaluations[x.key]||{};
+  const after=e.nilaiAkhir==null?"":e.nilaiAkhir;
+  let result="Belum dievaluasi",cls="warn";
+  if(after!==""){
+   const gain=Number(after)-x.nilaiAwal;
+   result=Number(after)>=75?"Mencapai KKTP":gain>0?"Meningkat, belum tuntas":gain<0?"Nilai menurun":"Belum meningkat";
+   cls=Number(after)>=75?"status-pass":"status-remedial";
+  }
+  return '<tr><td><strong>'+safe(x.nama)+'</strong></td><td>'+safe(x.kelas)+'</td><td>'+Math.round(x.nilaiAwal*10)/10+'</td><td><input type="number" min="0" max="100" step="0.1" id="ea_'+encodeURIComponent(x.key)+'" value="'+safe(after)+'" placeholder="0–100"></td><td><input type="date" id="ed_'+encodeURIComponent(x.key)+'" value="'+safe(e.tanggal||"")+'"></td><td><input class="eval-note" type="text" id="en_'+encodeURIComponent(x.key)+'" value="'+safe(e.catatan||"")+'" placeholder="Catatan hasil evaluasi"></td><td><span class="pill '+cls+'">'+result+'</span></td><td><button class="rowbtn" data-save-eval="'+encodeURIComponent(x.key)+'">Simpan</button></td></tr>';
+ }).join(""):'<tr><td colspan="8" class="empty">Belum ada siswa dengan nilai awal di bawah KKTP 75. Data evaluasi akan muncul setelah hasil kuis siswa diimpor.</td></tr>';
+ document.querySelectorAll("[data-save-eval]").forEach(b=>b.addEventListener("click",()=>{
+  const key=decodeURIComponent(b.dataset.saveEval),encoded=encodeURIComponent(key);
+  const raw=$("ea_"+encoded).value,after=Number(raw);
+  if(raw===""||!Number.isFinite(after)||after<0||after>100){$("evaluationStatus").textContent="Masukkan nilai evaluasi ulang antara 0 sampai 100.";return}
+  const student=students.find(x=>x.key===key);
+  evaluations[key]={nama:student.nama,kelas:student.kelas,nilaiAwal:student.nilaiAwal,nilaiAkhir:after,tanggal:$("ed_"+encoded).value,catatan:$("en_"+encoded).value,updated:new Date().toISOString()};
+  save();renderEvaluation();
+  $("evaluationStatus").textContent="Hasil evaluasi ulang "+student.nama+" berhasil disimpan.";
+ }));
+}
 function printTeacherReport(){
  const list=reportStudents(),passed=list.filter(x=>x.status==="Tuntas"),remedial=list.filter(x=>x.status==="Perlu remedial"),pending=list.filter(x=>x.status==="Belum dinilai");
  const scored=list.filter(x=>x.nilai!==null),average=scored.length?scored.reduce((s,x)=>s+x.nilai,0)/scored.length:null;
